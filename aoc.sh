@@ -1,0 +1,215 @@
+#!/usr/bin/env bash
+
+# IMPORTANT VALUES
+# Change the following values as needed:
+#     CHALLENGE_DIR: directory in which challenges are stored
+#     TEMPLATE_DIR: directory where the template files are stored
+CHALLENGE_DIR="./Challenges"
+TEMPLATE_DIR="./Challenge_Template"
+
+# Constants
+declare -r MODE_HELP=0
+declare -r MODE_CREATE=1
+declare -r MODE_RUN=2
+
+OUTPUT_MODE=$MODE_HELP
+SHOW_ERROR=0 # Used by $MODE_HELP to determine if help menu is shown due to error or user input
+ERROR_DESCR=""
+CREATE_CHALLENGE_NAME=""
+RUN_CHALLENGE_NAME=""
+
+# Process single dash flags
+# Options:
+#     -h: Print help docs
+#     -n: Create a new challenge
+# All other options should result in an error (unknown)
+while getopts ":hn:" opt; do
+    case "${opt}" in 
+        h)
+            OUTPUT_MODE=$MODE_HELP
+            SHOW_ERROR=0
+            break
+            ;;
+        n)  
+            OUTPUT_MODE=$MODE_CREATE
+            CREATE_CHALLENGE_NAME=${OPTARG}
+            ;;
+        \?)
+            OUTPUT_MODE=$MODE_HELP
+            SHOW_ERROR=1
+            ERROR_DESCR="Unknown flag: -${OPTARG}"
+            break
+            ;;
+        :)
+            OUTPUT_MODE=$MODE_HELP
+            SHOW_ERROR=1
+            ERROR_DESCR="Flag requires an arguement: -${OPTARG}"
+            break
+            ;;
+        *)
+            OUTPUT_MODE=$MODE_HELP
+            SHOW_ERROR=1
+            ERROR_DESCR="Unknown flag: -${OPTARG}"
+            break
+            ;;
+    esac
+done
+
+shift $((OPTIND - 1))
+
+# Process double dash flags
+# Options:
+#     --help: Print help docs
+#     --new-challenge: Create a new challenge
+# No flag should mean a challenge is run - no input will result in an error
+if [[ $# == 0 ]]&& [[ $OUTPUT_MODE -eq $MODE_HELP ]]; then
+    OUTPUT_MODE=$MODE_HELP
+    SHOW_ERROR=1
+    ERROR_DESCR="No name or flag provided"
+fi
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --help)
+            OUTPUT_MODE=$MODE_HELP
+            SHOW_ERROR=0
+            break
+            ;;
+        --new-challenge)
+            if [[ -z "$2" || "$2" =~ ^- ]]; then
+                OUTPUT_MODE=$MODE_HELP
+                SHOW_ERROR=1
+                ERROR_DESCR="Missing Argument: --new-challenge <NAME>"
+            else
+                OUTPUT_MODE=$MODE_CREATE
+                CREATE_CHALLENGE_NAME="$2"
+                shift
+                break
+            fi
+            ;;
+        -*)
+            OUTPUT_MODE=$MODE_HELP
+            SHOW_ERROR=1
+            ERROR_DESCR="Unknown input: $1"
+            break
+            ;;
+        *)
+            OUTPUT_MODE=$MODE_RUN
+            RUN_CHALLENGE_NAME="$1"
+            break
+            ;;
+    esac
+    shift
+done
+
+# Print Help Screen for this function
+# Paramters:
+#     $1: Exit Code - Exit code after printing help
+#     $2: Error message - If ending in nonzero exit code, error message to print
+print_help_msg() {
+    if [[ $1 -ne 0 ]]; then
+        local RED='\033[4;31m'
+        local RESET='\033[0m'
+        echo ""
+        echo -e "${RED}$2${RESET}" >&2
+        echo ""
+    fi
+    local UL='\033[4m'
+    local RESET='\033[0m'
+    echo -e "** ${UL}Not Official Advent of Code Template${RESET} **"
+    cat <<- EOF
+
+Usage:  aoc <NUMBER>                Runs challenge named 'Day<NUMBER>'
+        aoc <NAME>                  Runs challenge named <NAME>
+        aoc [OPTIONS] <ARG>         ...
+
+A tool to manage and run C/C++ code for Advent of Code Challenges. This tool is not
+optimized for speed.
+
+Options:
+  -h  --help                        Display help details
+
+  -n  --new-challenge <NAME>        Create a new project of name <NAME>
+                                    Note: Challenges with format 'DayXX' can be run
+                                    with 'aoc XX' (ex. 'aoc 1', aoc'11')
+                                    Challenges with any other name must be run wiith
+                                    'aoc <NAME>
+
+EOF
+    exit $1
+}
+
+# Create new challenge in ${CHALLENGE_DIR} based on files in ${TEMPLATE_DIR}
+# If directory exists, an error is displayed
+# For template files, 'TEMPLATE_NAME' will be replace with $1. If the file name
+# contains the string 'TEMPLATE_NAME', just that portion will be replaced
+# 
+# Parameters
+#     $1: Name - Challenge name
+create_challenge() {
+    # If no value is passed to this function
+    if [[ -z $1 ]]; then
+        print_help_msg 1 "No argument provided to create a new challenge"
+    fi
+
+    TARGET_DIR="$1"
+    shopt -s dotglob
+    if [[ ! -d "${CHALLENGE_DIR}/$TARGET_DIR" ]]; then
+        # If the value contains a slash, mkdir will create a weird directory structure
+        if [[ "${TAREGT_DIR}" = */* ]]; then
+            print_help_msg 1 "Directory string cannot contain character '/'"
+        else
+            mkdir -p ${CHALLENGE_DIR}/${TARGET_DIR}
+            for template_file in "$TEMPLATE_DIR"/*; do
+                if [[ "$template_file" == "$TARGET_DIR/*" ]]; then
+                    continue
+                elif [[ -f "$template_file" ]]; then
+                    BASE_FILE=$(basename "$template_file")
+                    NEW_BASE_FILE=${BASE_FILE/"TEMPLATE_NAME"/$TARGET_DIR}
+
+                    echo "Copying $NEW_BASE_FILE..."
+                    cp $template_file "$CHALLENGE_DIR/$TARGET_DIR/$NEW_BASE_FILE"
+                fi
+            done
+        fi
+    else
+        print_help_msg 1 "Directory already exists - if empty, delete before running this command again"
+    fi
+    shopt -u dotglob
+    echo -e "\033[34mCreated a new directory ${CHALLENGE_DIR}/${TARGET_DIR}\033[0m"
+    if [[ "$TARGET_DIR" = *"Day"* ]]; then
+        NUMBER=${TARGET_DIR#Day}
+        echo "To run this challenge, run the command: aoc $NUMBER"
+    else
+        echo "To run this challenge, run the command: aoc $TARGET_DIR"
+    fi
+}
+
+# Run a challenge file, after running relevant CMAKE commands
+# Parameters:
+#     $1: Name - Project Name
+run_challenge() {
+    echo "Compiling using CMAKE"
+    if command -v cmake &> /dev/null; then
+        echo ""
+    else
+        print_help_msg 1 "CMake is not installed. Install CMake using a supported package manager."
+    fi
+}
+
+# Main logical code
+case $OUTPUT_MODE in
+    $MODE_HELP)
+        print_help_msg $SHOW_ERROR "$ERROR_DESCR"
+        ;;
+    $MODE_CREATE)
+        create_challenge "${CREATE_CHALLENGE_NAME}"
+        ;;
+    $MODE_RUN)
+        echo "Running a challenge"
+        ;;
+    *)
+        print_help_msg 1 "Unknown error occured when running the script"
+        ;;
+esac
+
+exit 0
