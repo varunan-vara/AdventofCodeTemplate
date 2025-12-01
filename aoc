@@ -150,8 +150,26 @@ create_challenge() {
     if [[ -z $1 ]]; then
         print_help_msg 1 "No argument provided to create a new challenge"
     fi
+    local INPUT_NAME="$1"
+    local TARGET_DIR=""
 
-    TARGET_DIR="$1"
+    if [[ "$INPUT_NAME" =~ ^[0-9]+$ ]]; then
+        if (( 10#$INPUT_NAME < 10 )); then
+            TARGET_DIR="Day0${INPUT_NAME}"
+        else
+            TARGET_DIR="Day${INPUT_NAME}"
+        fi
+    elif [[ "$INPUT_NAME" =~ ^[Dd]ay[0-9]+$ ]]; then
+        local NUMBER=${INPUT_NAME//[^0-9]/} # Remove all non-digits
+        if (( 10#$NUMBER < 10 )) && [[ "${#NUMBER}" -lt 2 ]]; then
+            TARGET_DIR="Day0${NUMBER}"
+        else
+            TARGET_DIR="Day${NUMBER}"
+        fi
+    else
+        TARGET_DIR="$INPUT_NAME"
+    fi
+
     shopt -s dotglob
     if [[ ! -d "${CHALLENGE_DIR}/$TARGET_DIR" ]]; then
         # If the value contains a slash, mkdir will create a weird directory structure
@@ -159,6 +177,7 @@ create_challenge() {
             print_help_msg 1 "Directory string cannot contain character '/'"
         else
             mkdir -p ${CHALLENGE_DIR}/${TARGET_DIR}
+            touch ${CHALLENGE_DIR}/${TAREGT_DIR}/input.txt
             for template_file in "$TEMPLATE_DIR"/*; do
                 if [[ "$template_file" == "$TARGET_DIR/*" ]]; then
                     continue
@@ -188,11 +207,31 @@ create_challenge() {
 # Parameters:
 #     $1: Name - Project Name
 run_challenge() {
-    echo "Compiling using CMAKE"
-    if command -v cmake &> /dev/null; then
-        echo ""
-    else
+    local PROJECT_NAME="$1"
+
+    if ! command -v cmake &> /dev/null; then
         print_help_msg 1 "CMake is not installed. Install CMake using a supported package manager."
+    fi
+    
+    echo -e "\033[33mConfiguring and Building using CMake...\033[0m"
+    
+    mkdir -p build 
+
+    cmake -B build -S . || { 
+        print_help_msg 1 "CMake configure failed for challenge ${PROJECT_NAME}."
+    }
+
+    cmake --build build --target "${PROJECT_NAME}" || {
+        print_help_msg 1 "Compilation failed for challenge ${PROJECT_NAME}."
+    }
+    
+    EXECUTABLE_PATH="./build/${PROJECT_NAME}"
+    
+    if [[ -f "$EXECUTABLE_PATH" ]]; then
+        echo -e "\033[32mExecuting ${PROJECT_NAME}...\033[0m"
+        "$EXECUTABLE_PATH"
+    else
+        print_help_msg 1 "Executable not found at ${EXECUTABLE_PATH}. Check challenge name and compilation."
     fi
 }
 
@@ -205,7 +244,23 @@ case $OUTPUT_MODE in
         create_challenge "${CREATE_CHALLENGE_NAME}"
         ;;
     $MODE_RUN)
-        echo "Running a challenge"
+        local PROJECT_NAME=""
+
+        if [[ "$RUN_CHALLENGE_NAME" =~ ^[0-9]+$ ]]; then
+            if (( 10#$RUN_CHALLENGE_NAME < 10 )); then
+                PROJECT_NAME="Day0${RUN_CHALLENGE_NAME}"
+            else
+                PROJECT_NAME="Day${RUN_CHALLENGE_NAME}"
+            fi
+        else
+            PROJECT_NAME="${RUN_CHALLENGE_NAME}"
+        fi
+        
+        if [[ ! -d "${CHALLENGE_DIR}/${PROJECT_NAME}" ]]; then
+            print_help_msg 1 "Challenge directory not found for ${PROJECT_NAME}. Did you run 'aoc -n ${PROJECT_NAME}' first?"
+        fi
+        
+        run_challenge "${PROJECT_NAME}"
         ;;
     *)
         print_help_msg 1 "Unknown error occured when running the script"
