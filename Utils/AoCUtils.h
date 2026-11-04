@@ -78,6 +78,17 @@ namespace AoCUtils
             // - inputVector: array of strings to be delimitted
             // - delimitterValue: character to split string by
             static std::vector<std::vector<std::string>> getDelimited2DArray(std::vector<std::string> inputVector, char delimitterValue);
+            // Use a regex string to delimit each line
+            //
+            // Parameters:
+            //  - delimitterPattern: regex pattern (every capture group must be numeric, or stoi throws)
+            std::vector<std::vector<int>> getDelimited2DIntArray(std::string delimitterPattern);
+            // Using a specific character, delimit each line string
+            //
+            // Parameters:
+            // - delimitterValue: character to split the string by
+            std::vector<std::vector<int>> getDelimited2DIntArray(char delimitterValue);
+
             // Returns the value of a char at a point in the string, assuming newlines are different y entries
             //
             // Parameters:

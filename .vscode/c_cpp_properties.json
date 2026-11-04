@@ -1,0 +1,15 @@
+{
+    "configurations": [
+        {
+            "name": "AdventOfCode",
+            "includePath": [
+                "${workspaceFolder}/Utils"
+            ],
+            "defines": [
+                "AOC_ROOT_DIR=\"${workspaceFolder}\""
+            ],
+            "cppStandard": "c++17"
+        }
+    ],
+    "version": 4
+}

@@ -149,6 +149,36 @@ namespace AoCUtils {
         return return_vector;
     }
 
+    std::vector<std::vector<int>> InputFile::getDelimited2DIntArray(std::string delimitterPattern) {
+        std::vector<std::vector<int>> return_vector;
+
+        for (const auto& row : getDelimited2DArray(delimitterPattern)) {
+            std::vector<int> intRow;
+            for (const std::string& value : row) {
+                intRow.push_back(std::stoi(value));
+            }
+            return_vector.push_back(std::move(intRow));
+        }
+
+        return return_vector;
+    }
+
+    std::vector<std::vector<int>> InputFile::getDelimited2DIntArray(char delimitterValue) {
+        std::vector<std::vector<int>> return_vector;
+
+        for (const auto& row : getDelimited2DArray(delimitterValue)) {
+            std::vector<int> intRow;
+            for (const std::string& value : row) {
+                // Skip empty entries (e.g. "1,,2") rather than letting stoi throw
+                if (value.empty()) continue;
+                intRow.push_back(std::stoi(value));
+            }
+            return_vector.push_back(std::move(intRow));
+        }
+
+        return return_vector;
+    }
+
     char InputFile::getGridValue(int xIndex, int yIndex) {
         return parsedInput[yIndex][xIndex];
     }
