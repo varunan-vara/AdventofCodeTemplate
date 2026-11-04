@@ -19,6 +19,8 @@ SHOW_ERROR=0 # Used by $MODE_HELP to determine if help menu is shown due to erro
 ERROR_DESCR=""
 CREATE_CHALLENGE_NAME=""
 RUN_CHALLENGE_NAME=""
+RUN_ARGS=()
+ARG_COUNT=$# # Arguments given to the script, before getopts consumes any
 
 # Process single dash flags
 # Options:
@@ -64,7 +66,7 @@ shift $((OPTIND - 1))
 #     --help: Print help docs
 #     --new-challenge: Create a new challenge
 # No flag should mean a challenge is run - no input will result in an error
-if [[ $# == 0 ]]&& [[ $OUTPUT_MODE -eq $MODE_HELP ]]; then
+if [[ $ARG_COUNT -eq 0 ]]; then
     OUTPUT_MODE=$MODE_HELP
     SHOW_ERROR=1
     ERROR_DESCR="No name or flag provided"
@@ -97,6 +99,8 @@ while [[ $# -gt 0 ]]; do
         *)
             OUTPUT_MODE=$MODE_RUN
             RUN_CHALLENGE_NAME="$1"
+            shift
+            RUN_ARGS=("$@") # Passed through to the challenge (ex. --part 1, --visualize)
             break
             ;;
     esac
@@ -118,10 +122,11 @@ print_help_msg() {
     local UL='\033[4m'
     local RESET='\033[0m'
     echo -e "** ${UL}Not Official Advent of Code Template${RESET} **"
+    echo -e "\n** Help Menu Generated using AI **"
     cat <<- EOF
 
-Usage:  aoc <NUMBER>                Runs challenge named 'Day<NUMBER>'
-        aoc <NAME>                  Runs challenge named <NAME>
+Usage:  aoc <NUMBER> [ARGS]         Runs challenge named 'Day<NUMBER>'
+        aoc <NAME> [ARGS]           Runs challenge named <NAME>
         aoc [OPTIONS] <ARG>         ...
 
 A tool to manage and run C/C++ code for Advent of Code Challenges. This tool is not
@@ -135,6 +140,11 @@ Options:
                                     with 'aoc XX' (ex. 'aoc 1', 'aoc 11')
                                     Challenges with any other name must be run with
                                     'aoc <NAME>'
+
+Challenge arguments (placed after the challenge name, ex. 'aoc 1 --part 2'):
+  --part <N>                        Run only part N (1 or 2); both by default
+  -v  --visualize                   Tell the challenge to visualize
+  anything else                     Available to the challenge as challenge.args
 
 EOF
     exit $1
@@ -230,7 +240,7 @@ run_challenge() {
     
     if [[ -f "$EXECUTABLE_PATH" ]]; then
         echo -e "\033[32mExecuting ${PROJECT_NAME}...\033[0m"
-        "$EXECUTABLE_PATH"
+        "$EXECUTABLE_PATH" ${RUN_ARGS[@]+"${RUN_ARGS[@]}"}
     else
         print_help_msg 1 "Executable not found at ${EXECUTABLE_PATH}. Check challenge name and compilation."
     fi

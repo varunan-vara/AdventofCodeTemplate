@@ -2,9 +2,16 @@
 #include <iostream>
 
 int main (int argc, char *argv[]) {
-    // Do not change the following lines - this gets the FileInput type
-    std::string fileName = argv[0];
-    AoCUtils::InputFile challengeInput = AoCUtils::getFileInput(fileName);
+    // Do not change the following lines - this gets the challenge info and input
+    AoCUtils::Challenge challenge = AoCUtils::getChallenge(argc, argv);
+    AoCUtils::InputFile &challengeInput = challenge.input;
 
-    std::cout << "Challenge code for " << argv[0] << std::endl;
+    std::cout << "Challenge code for " << challenge.name << std::endl;
+
+    if (challenge.runPart(1)) {
+        // Part 1
+    }
+    if (challenge.runPart(2)) {
+        // Part 2
+    }
 }

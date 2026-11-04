@@ -1,4 +1,4 @@
-#include "AoCUtils.h"
+#include "InputFile.h"
 
 namespace AoCUtils {
     InputFile::InputFile(std::string fileName) {
@@ -190,11 +190,4 @@ namespace AoCUtils {
 
         parsedInput[yIndex][xIndex] = value;
     }
-    InputFile getFileInput (std::string fileName) {
-        size_t last_slash = fileName.find_last_of('/');
-        std::string day_name = fileName.substr(last_slash + 1);
-        AoCUtils::InputFile challengeInput = AoCUtils::InputFile(std::string(AOC_ROOT_DIR) + "/Challenges/" + day_name + "/input.txt");
-        return challengeInput;
-    }
 }
-

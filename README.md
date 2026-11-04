@@ -39,3 +39,28 @@ For a personal project, not necessary, but was to make it full-featured
 **Run a challenge with the name as the argument passed into the command.**
 
 If you run `./aoc XX`, where XX is a number, it will run the project titled `DayXX`. Otherwise, it will run the project of the same name.
+
+Anything after the challenge name is passed to the challenge itself:
+
+| Argument | Effect |
+|---|---|
+| `--part <N>` or `--part=<N>` | Run only part `N` (1 or 2). Both parts run by default (`0`). |
+| `-v` or `--visualize` | Sets `challenge.visualize`, for challenges that can draw or simulate. |
+| anything else | Available in order as `challenge.args`. |
+
+For example, `./aoc 5 --part 2 -v` runs only part 2 of `Day05` with visualization on. An invalid `--part` value (anything other than 0, 1 or 2) stops with an error.
+
+## Challenge info in `main`
+
+Each challenge's `main` calls `AoCUtils::getChallenge(argc, argv)`, which returns a `Challenge` with:
+
+ - `name`: the challenge name, such as `Day01`
+ - `dir`: the challenge's source folder
+ - `fileName`: the full path of the input file being read
+ - `rootDir`: the repo root
+ - `args`: the extra arguments described above
+ - `visualize`: whether `-v` or `--visualize` was passed
+ - `part`: `0` for both parts, or `1` or `2`
+ - `input`: the parsed `InputFile`
+
+`challenge.runPart(1)` and `challenge.runPart(2)` tell you which parts to run, so you can wrap each part in `if (challenge.runPart(N)) { ... }`. The template already does this.
