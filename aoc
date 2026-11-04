@@ -4,6 +4,8 @@
 # Change the following values as needed:
 #     CHALLENGE_DIR: directory in which challenges are stored
 #     TEMPLATE_DIR: directory where the template files are stored
+# Paths are relative to the directory containing this script, so 'aoc' can be run from anywhere
+cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" || exit 1
 CHALLENGE_DIR="./Challenges"
 TEMPLATE_DIR="./Challenge_Template"
 
@@ -43,7 +45,7 @@ while getopts ":hn:" opt; do
         :)
             OUTPUT_MODE=$MODE_HELP
             SHOW_ERROR=1
-            ERROR_DESCR="Flag requires an arguement: -${OPTARG}"
+            ERROR_DESCR="Flag requires an argument: -${OPTARG}"
             break
             ;;
         *)
@@ -131,8 +133,8 @@ Options:
   -n  --new-challenge <NAME>        Create a new project of name <NAME>
                                     Note: Challenges with format 'DayXX' can be run
                                     with 'aoc XX' (ex. 'aoc 1', 'aoc 11')
-                                    Challenges with any other name must be run wiith
-                                    'aoc <NAME>
+                                    Challenges with any other name must be run with
+                                    'aoc <NAME>'
 
 EOF
     exit $1
@@ -173,10 +175,10 @@ create_challenge() {
     shopt -s dotglob
     if [[ ! -d "${CHALLENGE_DIR}/$TARGET_DIR" ]]; then
         # If the value contains a slash, mkdir will create a weird directory structure
-        if [[ "${TAREGT_DIR}" = */* ]]; then
+        if [[ "${TARGET_DIR}" = */* ]]; then
             print_help_msg 1 "Directory string cannot contain character '/'"
         else
-            mkdir -p ${CHALLENGE_DIR}/${TARGET_DIR}
+            mkdir -p "${CHALLENGE_DIR}/${TARGET_DIR}"
             for template_file in "$TEMPLATE_DIR"/*; do
                 if [[ "$template_file" == "$TARGET_DIR/*" ]]; then
                     continue
@@ -185,7 +187,7 @@ create_challenge() {
                     NEW_BASE_FILE=${BASE_FILE/"TEMPLATE_NAME"/$TARGET_DIR}
 
                     echo "Copying $NEW_BASE_FILE..."
-                    cp $template_file "$CHALLENGE_DIR/$TARGET_DIR/$NEW_BASE_FILE"
+                    cp "$template_file" "$CHALLENGE_DIR/$TARGET_DIR/$NEW_BASE_FILE"
                 fi
             done
         fi
@@ -262,7 +264,7 @@ case $OUTPUT_MODE in
         run_challenge "${PROJECT_NAME}"
         ;;
     *)
-        print_help_msg 1 "Unknown error occured when running the script"
+        print_help_msg 1 "Unknown error occurred when running the script"
         ;;
 esac
 

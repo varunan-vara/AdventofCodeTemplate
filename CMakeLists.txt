@@ -11,6 +11,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
 # Shared utilities, linked into every challenge
 add_library(AoCUtilsLib STATIC ${CMAKE_CURRENT_SOURCE_DIR}/Utils/AoCUtils.cpp)
 target_include_directories(AoCUtilsLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Utils)
+# Lets getFileInput find Challenges/<name>/input.txt no matter where the binary is run from
+target_compile_definitions(AoCUtilsLib PRIVATE AOC_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
 # Builds Challenges/<name>/<name>.cpp into an executable named <name>
 function(add_challenge name)

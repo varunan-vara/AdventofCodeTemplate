@@ -2,14 +2,11 @@
 
 namespace AoCUtils {
     InputFile::InputFile(std::string fileName) {
-        std::ios::sync_with_stdio(false);
-        std::cin.tie(NULL);
-
         // Use fstream for reading lines
         std::ifstream file_stream(fileName);
 
         if (!file_stream.is_open()) {
-            std::cerr << "Error: Could not open file at path: " << fileName << std::endl;
+            throw std::runtime_error("Could not open file at path: " + fileName);
         }
 
         std::string line;
@@ -166,7 +163,7 @@ namespace AoCUtils {
     InputFile getFileInput (std::string fileName) {
         size_t last_slash = fileName.find_last_of('/');
         std::string day_name = fileName.substr(last_slash + 1);
-        AoCUtils::InputFile challengeInput = AoCUtils::InputFile("Challenges/" + day_name + "/input.txt");
+        AoCUtils::InputFile challengeInput = AoCUtils::InputFile(std::string(AOC_ROOT_DIR) + "/Challenges/" + day_name + "/input.txt");
         return challengeInput;
     }
 }
