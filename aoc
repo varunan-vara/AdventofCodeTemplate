@@ -130,7 +130,7 @@ Options:
 
   -n  --new-challenge <NAME>        Create a new project of name <NAME>
                                     Note: Challenges with format 'DayXX' can be run
-                                    with 'aoc XX' (ex. 'aoc 1', aoc'11')
+                                    with 'aoc XX' (ex. 'aoc 1', 'aoc 11')
                                     Challenges with any other name must be run wiith
                                     'aoc <NAME>
 
@@ -177,7 +177,6 @@ create_challenge() {
             print_help_msg 1 "Directory string cannot contain character '/'"
         else
             mkdir -p ${CHALLENGE_DIR}/${TARGET_DIR}
-            touch ${CHALLENGE_DIR}/${TAREGT_DIR}/input.txt
             for template_file in "$TEMPLATE_DIR"/*; do
                 if [[ "$template_file" == "$TARGET_DIR/*" ]]; then
                     continue
@@ -244,7 +243,7 @@ case $OUTPUT_MODE in
         create_challenge "${CREATE_CHALLENGE_NAME}"
         ;;
     $MODE_RUN)
-        local PROJECT_NAME=""
+        PROJECT_NAME=""
 
         if [[ "$RUN_CHALLENGE_NAME" =~ ^[0-9]+$ ]]; then
             if (( 10#$RUN_CHALLENGE_NAME < 10 )); then
