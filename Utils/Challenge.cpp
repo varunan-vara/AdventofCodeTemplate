@@ -1,5 +1,9 @@
 #include "Challenge.h"
 
+#include <cstdlib>
+#include <fstream>
+#include <iostream>
+
 namespace AoCUtils {
     Challenge getChallenge (int argc, char *argv[]) {
         std::string exePath = argv[0];
@@ -38,6 +42,13 @@ namespace AoCUtils {
         }
 
         std::string fileName = dir + "/input.txt";
+
+        if (!std::ifstream(fileName).good()) {
+            std::cerr << "\033[31mInput file not found: " << fileName << "\033[0m\n"
+                      << "Create a new txt file, and paste input contents there. .gitignored by default" << std::endl;
+            std::exit(1);
+        }
+
         return Challenge{name, dir, fileName, root, args, visualize, part, InputFile(fileName)};
     }
 
