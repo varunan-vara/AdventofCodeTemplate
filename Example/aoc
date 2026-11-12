@@ -1,0 +1,5 @@
+#!/usr/bin/env bash
+# Stub: runs the library's aoc script on this project, so 'aoc' here creates and runs
+# challenges in Example/Challenges
+export AOC_PROJECT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+exec "$AOC_PROJECT_DIR/../aoc" "$@"

@@ -7,16 +7,18 @@ My personal template repository that I use to run C++ code for Advent of Code
 1. Use this repository as a GitHub template (or clone it and delete the `.git` folder), then create a new git repo for the year.
 2. Use `chmod +x aoc` to enable execution on the file 'aoc' in the root of the directory.
 3. Requires `cmake` and a C++17 compiler.
-4. Create your first challenge with `./aoc -n 1`, paste your puzzle input into `Challenges/Day01/input.txt`, and run it with `./aoc 1`.
+4. The repo is being turned into a library (see `LIBRARY_PLAN.md`), and the sample project that uses it is in `Example/`. Create your first challenge with `Example/aoc -n 1`, paste your puzzle input into `Example/Challenges/Day01/input.txt`, and run it with `Example/aoc 1`. The commands below are written as `./aoc`, run from `Example/`.
 
 ## Layout
 
- - `aoc`: script to create and run challenges. It can be run from any directory.
+ - `aoc`: script to create and run challenges. It can be run from any directory. It works on the project given by `AOC_PROJECT_DIR` (the folder with `Challenges/` and `build/`), or the folder it is in.
+ - `Example/`: sample project that uses the library, for testing it. Has its own `CMakeLists.txt` and an `aoc` stub that runs the library's script on `Example/`. Built too when the root `CMakeLists.txt` is the top-level project (`-DAOC_BUILD_EXAMPLE=OFF` to skip).
  - `Challenge_Template/`: files copied into every new challenge. `TEMPLATE_NAME` in a file name is replaced with the challenge name.
- - `Challenges/<name>/`: one folder per challenge, containing `<name>.cpp` and `input.txt`. Any folder with a matching `<name>.cpp` is built automatically by the root `CMakeLists.txt`, no per-challenge CMake file needed.
- - `Utils/`: shared library (`InputFile`, `Challenge`, `Solution`) linked into every challenge.
+ - `Example/Challenges/<name>/`: one folder per challenge, containing `<name>.cpp` and `input.txt`. Any folder with a matching `<name>.cpp` is built automatically by `aoc_add_challenges`, no per-challenge CMake file needed.
+ - `Utils/`: shared library (`InputFile`, `Challenge`, `Solution`) linked into every challenge. Headers are included as `<AoCUtils/AoCUtils.h>`.
+ - `cmake/AoCUtils.cmake`: builds the library and defines `aoc_add_challenges(<dir>)`, which the root `CMakeLists.txt` calls. Another project can `include()` it and call the same function.
 
-`input.txt` files in `Challenges/` are git-ignored, since Advent of Code asks that puzzle inputs not be shared.
+`input.txt` files in any `Challenges/` folder are git-ignored, since Advent of Code asks that puzzle inputs not be shared.
 
 ## Usage (generated using AI)
 

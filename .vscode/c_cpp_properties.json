@@ -6,7 +6,8 @@
                 "${workspaceFolder}/Utils"
             ],
             "defines": [
-                "AOC_ROOT_DIR=\"${workspaceFolder}\""
+                "AOC_ROOT_DIR=\"${workspaceFolder}/Example\"",
+                "AOC_CHALLENGES_DIR=\"Challenges\""
             ],
             "cppStandard": "c++17"
         }

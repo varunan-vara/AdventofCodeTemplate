@@ -1,4 +1,4 @@
-#include "InputFile.h"
+#include "AoCUtils/InputFile.h"
 
 namespace AoCUtils {
     InputFile::InputFile(std::string fileName) {

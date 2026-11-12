@@ -1,4 +1,4 @@
-#include "Solution.h"
+#include "AoCUtils/Solution.h"
 
 #include <benchmark/benchmark.h>
 #include <chrono>

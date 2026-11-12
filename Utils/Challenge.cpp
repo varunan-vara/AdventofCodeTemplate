@@ -1,15 +1,15 @@
-#include "Challenge.h"
+#include "AoCUtils/Challenge.h"
 
 #include <cstdlib>
 #include <fstream>
 #include <iostream>
 
 namespace AoCUtils {
-    Challenge getChallenge (int argc, char *argv[]) {
+    Challenge getChallenge (int argc, char *argv[], const std::string &rootDir, const std::string &challengesDir) {
         std::string exePath = argv[0];
         std::string name = exePath.substr(exePath.find_last_of('/') + 1);
-        std::string root = AOC_ROOT_DIR;
-        std::string dir = root + "/Challenges/" + name;
+        std::string root = rootDir;
+        std::string dir = root + "/" + challengesDir + "/" + name;
 
         std::vector<std::string> args;
         std::vector<std::string> benchArgs;
@@ -58,10 +58,10 @@ namespace AoCUtils {
         return Challenge{name, dir, fileName, root, args, visualize, part, bench, benchArgs, InputFile(fileName)};
     }
 
-    InputFile getFileInput (std::string fileName) {
+    InputFile getFileInput (std::string fileName, const std::string &rootDir, const std::string &challengesDir) {
         size_t last_slash = fileName.find_last_of('/');
         std::string day_name = fileName.substr(last_slash + 1);
-        AoCUtils::InputFile challengeInput = AoCUtils::InputFile(std::string(AOC_ROOT_DIR) + "/Challenges/" + day_name + "/input.txt");
+        AoCUtils::InputFile challengeInput = AoCUtils::InputFile(rootDir + "/" + challengesDir + "/" + day_name + "/input.txt");
         return challengeInput;
     }
 }

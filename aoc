@@ -4,10 +4,13 @@
 # Change the following values as needed:
 #     CHALLENGE_DIR: directory in which challenges are stored
 #     TEMPLATE_DIR: directory where the template files are stored
-# Paths are relative to the directory containing this script, so 'aoc' can be run from anywhere
-cd "$(dirname "$(realpath "${BASH_SOURCE[0]}")")" || exit 1
+# The project (challenges folder and build directory) is the directory containing this script,
+# or AOC_PROJECT_DIR if set, so a project can use this script through a small stub (see Example/aoc).
+# The template always comes from beside this script. 'aoc' can be run from anywhere
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+cd "${AOC_PROJECT_DIR:-$SCRIPT_DIR}" || exit 1
 CHALLENGE_DIR="./Challenges"
-TEMPLATE_DIR="./Challenge_Template"
+TEMPLATE_DIR="${SCRIPT_DIR}/Challenge_Template"
 
 # Constants
 declare -r MODE_HELP=0

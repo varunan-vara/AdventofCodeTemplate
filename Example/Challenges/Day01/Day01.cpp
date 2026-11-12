@@ -1,4 +1,4 @@
-#include "../Utils/AoCUtils.h"
+#include <AoCUtils/AoCUtils.h>
 #include <iostream>
 
 class Solution : public AoCUtils::Solution {

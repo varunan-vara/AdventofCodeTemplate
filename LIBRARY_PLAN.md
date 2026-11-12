@@ -4,6 +4,15 @@ Plan only, nothing here is implemented yet. Goal: a year's repo contains just it
 this repo is consumed as a dependency instead of cloned/copied. The `aoc` script stops being
 required: you create day folders yourself and the library handles the rest.
 
+## Status
+
+Done: sections 1 (per-challenge `AOC_ROOT_DIR`/`AOC_CHALLENGES_DIR`, set by `aoc_add_challenges`),
+2 (headers under `Utils/AoCUtils/`) and 3 (`cmake/AoCUtils.cmake`, root `CMakeLists.txt` now just
+calls `aoc_add_challenges(Challenges)`). Checked with a separate scratch project using a
+different challenges folder. The sample project lives in `Example/` (its own `CMakeLists.txt`, pulling in the library with
+`FetchContent` from `..`, plus an `aoc` stub that sets `AOC_PROJECT_DIR`), so the repo root is the
+library only. Not done: sections 4-7 (scaffolding, config keywords, stub, docs/tag).
+
 ## Target shape
 
 The library repo keeps `Utils/`, the template, and a CMake module. A year's repo is:
