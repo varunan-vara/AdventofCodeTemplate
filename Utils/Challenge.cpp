@@ -12,7 +12,9 @@ namespace AoCUtils {
         std::string dir = root + "/Challenges/" + name;
 
         std::vector<std::string> args;
+        std::vector<std::string> benchArgs;
         bool visualize = false;
+        bool bench = false;
         int part = 0;
 
         for (int i = 1; i < argc; i++) {
@@ -21,6 +23,10 @@ namespace AoCUtils {
 
             if (arg == "--visualize" || arg == "-v") {
                 visualize = true;
+            } else if (arg == "--bench") {
+                bench = true;
+            } else if (arg.rfind("--benchmark_", 0) == 0) {
+                benchArgs.push_back(arg);
             } else if (arg == "--part") {
                 if (i + 1 >= argc) {
                     throw std::runtime_error("--part requires a value (1 or 2)");
@@ -49,7 +55,7 @@ namespace AoCUtils {
             std::exit(1);
         }
 
-        return Challenge{name, dir, fileName, root, args, visualize, part, InputFile(fileName)};
+        return Challenge{name, dir, fileName, root, args, visualize, part, bench, benchArgs, InputFile(fileName)};
     }
 
     InputFile getFileInput (std::string fileName) {

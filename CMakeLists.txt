@@ -4,9 +4,26 @@ project(AdventOfCode LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+# Optimized by default: unoptimized builds make run times and benchmarks meaningless
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
+
 # Binaries land directly in the build directory (./build/<name>), which is where
 # the 'aoc' script looks for them
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR})
+
+# Google Benchmark, used by 'aoc <day> --bench' (see Solution::bench)
+include(FetchContent)
+set(BENCHMARK_ENABLE_TESTING OFF CACHE BOOL "" FORCE)
+set(BENCHMARK_ENABLE_GTEST_TESTS OFF CACHE BOOL "" FORCE)
+set(BENCHMARK_ENABLE_INSTALL OFF CACHE BOOL "" FORCE)
+set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
+FetchContent_Declare(benchmark
+    GIT_REPOSITORY https://github.com/google/benchmark
+    GIT_TAG v1.9.1
+)
+FetchContent_MakeAvailable(benchmark)
 
 # Shared utilities, linked into every challenge
 add_library(AoCUtilsLib STATIC
@@ -15,6 +32,7 @@ add_library(AoCUtilsLib STATIC
     ${CMAKE_CURRENT_SOURCE_DIR}/Utils/Solution.cpp
 )
 target_include_directories(AoCUtilsLib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/Utils)
+target_link_libraries(AoCUtilsLib PUBLIC benchmark::benchmark)
 # Lets getFileInput find Challenges/<name>/input.txt no matter where the binary is run from
 target_compile_definitions(AoCUtilsLib PRIVATE AOC_ROOT_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 
@@ -25,7 +43,6 @@ function(require_matplot)
         return()
     endif()
     message(STATUS "Matplot++ required, fetching it")
-    include(FetchContent)
     FetchContent_Declare(matplotplusplus
         GIT_REPOSITORY https://github.com/alandefreitas/matplotplusplus
         GIT_TAG origin/master

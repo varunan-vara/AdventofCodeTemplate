@@ -6,6 +6,12 @@ class Solution : public AoCUtils::Solution {
         // Do not change the following constructor
         Solution(AoCUtils::Challenge &c) : AoCUtils::Solution(c) {}
 
+        // Optional: parse the input into members here, so part1 and part2 only solve (and
+        // --bench can time parsing separately). Assign members rather than appending to them
+        // void parse() override {
+        //     AoCUtils::InputFile &challengeInput = challenge.input;
+        // }
+
         std::string part1() override {
             AoCUtils::InputFile &challengeInput = challenge.input;
 

@@ -24,6 +24,10 @@ namespace AoCUtils
         bool visualize;
         // Part to run (--part): 1 or 2, or 0 for both
         int part;
+        // True if --bench was passed
+        bool bench;
+        // --benchmark_* flags, forwarded to Google Benchmark
+        std::vector<std::string> benchArgs;
         // Parsed contents of fileName
         InputFile input;
 
@@ -34,8 +38,8 @@ namespace AoCUtils
         bool runPart(int p) const { return part == 0 || part == p; }
     };
 
-    // Builds a Challenge from main's arguments. Flags: --visualize/-v, --part <n>;
-    // everything else goes in args. Throws std::runtime_error on a bad --part value.
+    // Builds a Challenge from main's arguments. Flags: --visualize/-v, --part <n>, --bench
+    // (--benchmark_* flags go to benchArgs); everything else goes in args. Throws std::runtime_error on a bad --part value.
     // Prints an error and exits if the challenge's input.txt does not exist
     //
     // Parameters:

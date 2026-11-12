@@ -48,4 +48,10 @@ Anything after the challenge name is passed to the challenge itself:
 | `-v` or `--visualize` | Sets the `visualize` flag for the part being run. With `--part N`, part `N` visualizes. Without `--part`, part 1 runs normally and part 2 visualizes. |
 | anything else | Available in order as `challenge.args`. |
 
+| `--bench` | Benchmarks `parse`, `part1` and `part2` (those selected by `--part`) with Google Benchmark, instead of running once. `--benchmark_*` flags are forwarded, ex. `./aoc 5 --bench --benchmark_min_time=0.5s --benchmark_filter=part1`. |
+
+Builds default to `Release`, so run times and benchmarks are optimized. Override with `cmake -B build -DCMAKE_BUILD_TYPE=Debug`.
+
+`parse()` is an optional override on `Solution`: fill members from `challenge.input` there, so the parts only solve. It runs once before the parts, and is benchmarked on its own. Since `--bench` calls it repeatedly, assign members rather than appending to them.
+
 For example, `./aoc 5 --part 2 -v` runs only part 2 of `Day05` with visualization on. An invalid `--part` value (anything other than 0, 1 or 2) stops with an error.
