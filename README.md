@@ -1,59 +1,102 @@
-# Advent of Code Template
+# AoCUtils
 
-My personal template repository that I use to run C++ code for Advent of Code
+A C++17 library for running Advent of Code challenges. A year's repo holds only its solutions
+and pulls this library in as a dependency, so there is nothing to clone or copy.
+`Example/` is a sample project using it: copy it to start a year.
 
-## Instructions for use (generated using AI):
+Requires `cmake` (3.19+) and a C++17 compiler. The first configure needs network access, since
+the library and Google Benchmark are fetched with `FetchContent`.
 
-1. Use this repository as a GitHub template (or clone it and delete the `.git` folder), then create a new git repo for the year.
-2. Use `chmod +x aoc` to enable execution on the file 'aoc' in the root of the directory.
-3. Requires `cmake` and a C++17 compiler.
-4. The repo is being turned into a library (see `LIBRARY_PLAN.md`), and the sample project that uses it is in `Example/`. Create your first challenge with `Example/aoc -n 1`, paste your puzzle input into `Example/Challenges/Day01/input.txt`, and run it with `Example/aoc 1`. The commands below are written as `./aoc`, run from `Example/`.
+## Using it
 
-## Layout
+A year's repo looks like this:
 
- - `aoc`: script to create and run challenges. It can be run from any directory. It works on the project given by `AOC_PROJECT_DIR` (the folder with `Challenges/` and `build/`), or the folder it is in.
- - `Example/`: sample project that uses the library, for testing it. Has its own `CMakeLists.txt` and an `aoc` stub that runs the library's script on `Example/`. Built too when the root `CMakeLists.txt` is the top-level project (`-DAOC_BUILD_EXAMPLE=OFF` to skip).
- - `Challenge_Template/`: files copied into every new challenge. `TEMPLATE_NAME` in a file name is replaced with the challenge name.
- - `Example/Challenges/<name>/`: one folder per challenge, containing `<name>.cpp` and `input.txt`. Any folder with a matching `<name>.cpp` is built automatically by `aoc_add_challenges`, no per-challenge CMake file needed.
- - `Utils/`: shared library (`InputFile`, `Challenge`, `Solution`) linked into every challenge. Headers are included as `<AoCUtils/AoCUtils.h>`.
- - `cmake/AoCUtils.cmake`: builds the library and defines `aoc_add_challenges(<dir>)`, which the root `CMakeLists.txt` calls. Another project can `include()` it and call the same function.
+```
+MyYear/
+  CMakeLists.txt
+  Challenges/
+    Day01/Day01.cpp, input.txt
+    ...
+```
 
-`input.txt` files in any `Challenges/` folder are git-ignored, since Advent of Code asks that puzzle inputs not be shared.
+```cmake
+cmake_minimum_required(VERSION 3.19)
+project(AoC2026 LANGUAGES CXX)
 
-## Usage (generated using AI)
+include(FetchContent)
+FetchContent_Declare(AoCUtils GIT_REPOSITORY <this repo> GIT_TAG <version>)
+FetchContent_MakeAvailable(AoCUtils)
 
-The usage of this repo is mainly that of the script `aoc`. 
+# Optimized by default: unoptimized builds make run times and benchmarks meaningless
+if (NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE Release CACHE STRING "Build type" FORCE)
+endif()
 
-### `./aoc -n` or `./aoc --new-challenge`
+aoc_add_challenges(Challenges)
+```
 
-**Creates a new challenge with the name as the argument passed into the command.**
+Pin `GIT_TAG` to keep a year building against the version it was written for.
 
-Since this script was made for Advent of Code, naming it with the format `DayX`, `DayXX`, etc. would reperesent the code for Day XX.
+### Creating a challenge
 
-### `./aoc -h` or `./aoc --help`
+Make a folder in `Challenges/` and reconfigure (or just build):
 
-**Runs the help screen.**
+```
+mkdir Challenges/Day05
+cmake -B build
+```
 
-For a personal project, not necessary, but was to make it full-featured
+`Day05.cpp` and `input.txt` are generated from `Challenge_Template/`, where `TEMPLATE_NAME` in a
+file name or its contents becomes the folder name. Paste your puzzle input into `input.txt`.
+Inputs are git-ignored by the sample project, since Advent of Code asks that they not be shared.
 
-### `./aoc`
+Any folder containing a matching `<name>.cpp` is built automatically, no per-challenge CMake file
+needed, and the name doesn't have to be `DayXX`.
 
-**Run a challenge with the name as the argument passed into the command.**
+### Building and running
 
-If you run `./aoc XX`, where XX is a number, it will run the project titled `DayXX`. Otherwise, it will run the project of the same name.
+```
+cmake --build build --target Day05       # build
+./build/Day05                            # run, from anywhere
+cmake --build build --target run_Day05   # build and run, without arguments
+```
 
-Anything after the challenge name is passed to the challenge itself:
+Every challenge is also a target in an IDE such as CLion.
+
+### Arguments
+
+Arguments go to the binary, ex. `./build/Day05 --part 2 -v`:
 
 | Argument | Effect |
 |---|---|
-| `--part <N>` or `--part=<N>` | Run only part `N` (1 or 2). Both parts run by default (`0`). |
+| `--part <N>` or `--part=<N>` | Run only part `N` (1 or 2). Both parts run by default (`0`). Anything else is an error. |
 | `-v` or `--visualize` | Sets the `visualize` flag for the part being run. With `--part N`, part `N` visualizes. Without `--part`, part 1 runs normally and part 2 visualizes. |
+| `--bench` | Benchmarks `parse`, `part1` and `part2` (those selected by `--part`) with Google Benchmark, instead of running once. `--benchmark_*` flags are forwarded, ex. `--bench --benchmark_min_time=0.5s --benchmark_filter=part1`. |
 | anything else | Available in order as `challenge.args`. |
 
-| `--bench` | Benchmarks `parse`, `part1` and `part2` (those selected by `--part`) with Google Benchmark, instead of running once. `--benchmark_*` flags are forwarded, ex. `./aoc 5 --bench --benchmark_min_time=0.5s --benchmark_filter=part1`. |
+`parse()` is an optional override on `Solution`: fill members from `challenge.input` there, so
+the parts only solve. It runs once before the parts, and is benchmarked on its own. Since
+`--bench` calls it repeatedly, assign members rather than appending to them.
 
-Builds default to `Release`, so run times and benchmarks are optimized. Override with `cmake -B build -DCMAKE_BUILD_TYPE=Debug`.
+### Options
 
-`parse()` is an optional override on `Solution`: fill members from `challenge.input` there, so the parts only solve. It runs once before the parts, and is benchmarked on its own. Since `--bench` calls it repeatedly, assign members rather than appending to them.
+`aoc_add_challenges(<dir> ...)` takes:
 
-For example, `./aoc 5 --part 2 -v` runs only part 2 of `Day05` with visualization on. An invalid `--part` value (anything other than 0, 1 or 2) stops with an error.
+| Option | Default | Effect |
+|---|---|---|
+| `INPUT_FILE <name>` | `input.txt` | Name of each challenge's input file. |
+| `TEMPLATE <dir>` | the library's `Challenge_Template/` | Folder copied into new challenges, relative to your `CMakeLists.txt`. |
+| `AUTO_SCAFFOLD ON\|OFF` | `ON` | Generate the files of any folder in `<dir>` that has no `<name>.cpp`. When `OFF`, such folders are skipped with a warning. |
+
+### Matplot++
+
+Optional. If a challenge includes `<matplot/...>`, Matplot++ is fetched and linked for it only.
+It needs `gnuplot` at runtime (`brew install gnuplot`).
+
+## Layout
+
+ - `Utils/`: the library (`InputFile`, `Challenge`, `Solution`), linked into every challenge. Headers are included as `<AoCUtils/AoCUtils.h>`.
+ - `cmake/AoCUtils.cmake`: builds the library and defines `aoc_add_challenges`.
+ - `Challenge_Template/`: files copied into every new challenge.
+ - `Example/`: sample project using the library. Built too when this repo is the top-level project, ex. opened in an IDE (`-DAOC_BUILD_EXAMPLE=OFF` to skip).
+ - `LIBRARY_PLAN.md`: notes from turning the repo into a library.
