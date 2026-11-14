@@ -40,33 +40,36 @@ namespace AoCUtils
 
     // Builds a Challenge from main's arguments. Flags: --visualize/-v, --part <n>, --bench
     // (--benchmark_* flags go to benchArgs); everything else goes in args. Throws std::runtime_error on a bad --part value.
-    // Prints an error and exits if the challenge's input.txt does not exist
+    // Prints an error and exits if the challenge's input file does not exist
     //
     // Parameters:
     //  - argc: argument count from main
     //  - argv: arguments from main (argv[0] gives the challenge name)
     //  - rootDir: project root, which contains challengesDir
     //  - challengesDir: folder (relative to rootDir) holding one folder per challenge
-    Challenge getChallenge (int argc, char *argv[], const std::string &rootDir, const std::string &challengesDir);
+    //  - inputFile: name of the input file inside the challenge's folder
+    Challenge getChallenge (int argc, char *argv[], const std::string &rootDir, const std::string &challengesDir, const std::string &inputFile = "input.txt");
 
-    // Returns the InputFile of a challenge, found as <rootDir>/<challengesDir>/<name>/input.txt
+    // Returns the InputFile of a challenge, found as <rootDir>/<challengesDir>/<name>/<inputFile>
     // (name is the last component of fileName)
     //
     // Parameters:
     //  - fileName: path or name of the challenge, ex. argv[0]
     //  - rootDir: project root, which contains challengesDir
     //  - challengesDir: folder (relative to rootDir) holding one folder per challenge
-    InputFile getFileInput (std::string fileName, const std::string &rootDir, const std::string &challengesDir);
+    //  - inputFile: name of the input file inside the challenge's folder
+    InputFile getFileInput (std::string fileName, const std::string &rootDir, const std::string &challengesDir, const std::string &inputFile = "input.txt");
 
-    // AOC_ROOT_DIR and AOC_CHALLENGES_DIR are compile definitions that aoc_add_challenges sets on
-    // each challenge, so these resolve to the project using the library, not the library itself
-#if defined(AOC_ROOT_DIR) && defined(AOC_CHALLENGES_DIR)
+    // AOC_ROOT_DIR, AOC_CHALLENGES_DIR and AOC_INPUT_FILE are compile definitions that
+    // aoc_add_challenges sets on each challenge, so these resolve to the project using the library,
+    // not the library itself
+#if defined(AOC_ROOT_DIR) && defined(AOC_CHALLENGES_DIR) && defined(AOC_INPUT_FILE)
     inline Challenge getChallenge (int argc, char *argv[]) {
-        return getChallenge(argc, argv, AOC_ROOT_DIR, AOC_CHALLENGES_DIR);
+        return getChallenge(argc, argv, AOC_ROOT_DIR, AOC_CHALLENGES_DIR, AOC_INPUT_FILE);
     }
 
     inline InputFile getFileInput (std::string fileName) {
-        return getFileInput(fileName, AOC_ROOT_DIR, AOC_CHALLENGES_DIR);
+        return getFileInput(fileName, AOC_ROOT_DIR, AOC_CHALLENGES_DIR, AOC_INPUT_FILE);
     }
 #endif
 } // namespace AoCUtils

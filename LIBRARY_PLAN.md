@@ -11,7 +11,11 @@ Done: sections 1 (per-challenge `AOC_ROOT_DIR`/`AOC_CHALLENGES_DIR`, set by `aoc
 calls `aoc_add_challenges(Challenges)`). Checked with a separate scratch project using a
 different challenges folder. The sample project lives in `Example/` (its own `CMakeLists.txt`, pulling in the library with
 `FetchContent` from `..`, plus an `aoc` stub that sets `AOC_PROJECT_DIR`), so the repo root is the
-library only. Not done: sections 4-7 (scaffolding, config keywords, stub, docs/tag).
+library only. Section 4 done: a folder with no `<name>.cpp` is scaffolded from the template at configure time
+(`AUTO_SCAFFOLD ON|OFF` keyword, default ON), and every challenge gets a `run_<name>` target. No
+`aoc_new_day()`: `mkdir Challenges/Day05` is enough. Section 5 done: `INPUT_FILE`, `TEMPLATE` and
+`AUTO_SCAFFOLD` keywords on `aoc_add_challenges`; the input file name reaches C++ as `AOC_INPUT_FILE`.
+Not done: sections 6-7 (stub, docs/tag).
 
 ## Target shape
 

@@ -5,7 +5,7 @@
 #include <iostream>
 
 namespace AoCUtils {
-    Challenge getChallenge (int argc, char *argv[], const std::string &rootDir, const std::string &challengesDir) {
+    Challenge getChallenge (int argc, char *argv[], const std::string &rootDir, const std::string &challengesDir, const std::string &inputFile) {
         std::string exePath = argv[0];
         std::string name = exePath.substr(exePath.find_last_of('/') + 1);
         std::string root = rootDir;
@@ -47,7 +47,7 @@ namespace AoCUtils {
             }
         }
 
-        std::string fileName = dir + "/input.txt";
+        std::string fileName = dir + "/" + inputFile;
 
         if (!std::ifstream(fileName).good()) {
             std::cerr << "\033[31mInput file not found: " << fileName << "\033[0m\n"
@@ -58,10 +58,10 @@ namespace AoCUtils {
         return Challenge{name, dir, fileName, root, args, visualize, part, bench, benchArgs, InputFile(fileName)};
     }
 
-    InputFile getFileInput (std::string fileName, const std::string &rootDir, const std::string &challengesDir) {
+    InputFile getFileInput (std::string fileName, const std::string &rootDir, const std::string &challengesDir, const std::string &inputFile) {
         size_t last_slash = fileName.find_last_of('/');
         std::string day_name = fileName.substr(last_slash + 1);
-        AoCUtils::InputFile challengeInput = AoCUtils::InputFile(rootDir + "/" + challengesDir + "/" + day_name + "/input.txt");
+        AoCUtils::InputFile challengeInput = AoCUtils::InputFile(rootDir + "/" + challengesDir + "/" + day_name + "/" + inputFile);
         return challengeInput;
     }
 }
