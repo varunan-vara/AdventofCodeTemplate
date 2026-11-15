@@ -13,4 +13,23 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     if (AOC_BUILD_EXAMPLE)
         add_subdirectory(Example)
     endif()
+
+    # Tests: 'ctest --test-dir build'. Unit tests are quick. The integration test builds
+    # throwaway consumer projects (see tests/Integration.cmake), so it is opt-in
+    option(AOC_BUILD_TESTS "Build the unit tests" ON)
+    option(AOC_INTEGRATION_TESTS "Add the CMake integration test (slower)" OFF)
+    if (AOC_BUILD_TESTS)
+        enable_testing()
+        add_executable(UnitTests tests/UnitTests.cpp)
+        target_link_libraries(UnitTests PRIVATE AoCUtilsLib)
+        add_test(NAME UnitTests COMMAND UnitTests)
+
+        if (AOC_INTEGRATION_TESTS)
+            add_test(NAME Integration COMMAND ${CMAKE_COMMAND}
+                -DAOC_SRC=${CMAKE_CURRENT_SOURCE_DIR}
+                -DWORK=${CMAKE_BINARY_DIR}/integration
+                -DBENCHMARK_SRC=${benchmark_SOURCE_DIR}
+                -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/Integration.cmake)
+        endif()
+    endif()
 endif()

@@ -93,10 +93,24 @@ the parts only solve. It runs once before the parts, and is benchmarked on its o
 Optional. If a challenge includes `<matplot/...>`, Matplot++ is fetched and linked for it only.
 It needs `gnuplot` at runtime (`brew install gnuplot`).
 
+## Tests
+
+Built when this repo is the top-level project (`-DAOC_BUILD_TESTS=OFF` to skip):
+
+```
+cmake -B build
+cmake --build build --target UnitTests
+ctest --test-dir build
+```
+
+ - `UnitTests` (`tests/UnitTests.cpp`): `InputFile`, `getChallenge` argument parsing and `Solution::run`, using temp fixtures.
+ - `Integration` (`tests/Integration.cmake`, add with `-DAOC_INTEGRATION_TESTS=ON`): builds throwaway projects that use the library through `FetchContent`, checking scaffolding, `INPUT_FILE`, `TEMPLATE`, `AUTO_SCAFFOLD` and `run_<name>`. Takes about a minute.
+
 ## Layout
 
  - `Utils/`: the library (`InputFile`, `Challenge`, `Solution`), linked into every challenge. Headers are included as `<AoCUtils/AoCUtils.h>`.
  - `cmake/AoCUtils.cmake`: builds the library and defines `aoc_add_challenges`.
  - `Challenge_Template/`: files copied into every new challenge.
  - `Example/`: sample project using the library. Built too when this repo is the top-level project, ex. opened in an IDE (`-DAOC_BUILD_EXAMPLE=OFF` to skip).
+ - `tests/`: unit and integration tests.
  - `LIBRARY_PLAN.md`: notes from turning the repo into a library.
