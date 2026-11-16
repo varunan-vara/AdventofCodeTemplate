@@ -50,6 +50,10 @@ static void testInputFile() {
 
     CHECK(input.numberOfLines() == 3);
     CHECK(input.numberOfChars() == 3);
+
+    // The longest line, wherever it is: a short or blank last line does not change it
+    std::string ragged = fx.write("ragged.txt", "abcd\nab\n\n").string();
+    CHECK(AoCUtils::InputFile(ragged).numberOfChars() == 4);
     CHECK(input.getLine(1) == "def");
     CHECK(input.getFullString() == "abcdefghi");
     CHECK(input.getParsedInput().size() == 3);

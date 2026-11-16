@@ -1,6 +1,7 @@
 #ifndef AOCUTILS_INPUTFILE
 #define AOCUTILS_INPUTFILE
 
+#include <algorithm>
 #include <vector>
 #include <string>
 #include <fstream>
@@ -36,7 +37,7 @@ namespace AoCUtils
             // Parameters: none
             int numberOfLines();
 
-            // Returns the number of characters in one line of input (last line)
+            // Returns the number of characters in the longest line of input (the width of a grid)
             //
             // Parameters: none
             int numberOfChars();

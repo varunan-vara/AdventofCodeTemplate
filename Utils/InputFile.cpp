@@ -13,7 +13,7 @@ namespace AoCUtils {
 
         while (std::getline(file_stream, line)) {
             // Cache this
-            charSize = line.size();
+            charSize = std::max<long long>(charSize, line.size());
             parsedInput.push_back(std::move(line));
         }
 
