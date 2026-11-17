@@ -90,8 +90,22 @@ the parts only solve. It runs once before the parts, and is benchmarked on its o
 
 ### Matplot++
 
-Optional. If a challenge includes `<matplot/...>`, Matplot++ is fetched and linked for it only.
-It needs `gnuplot` at runtime (`brew install gnuplot`).
+Optional. If a challenge includes `<matplot/...>` or `<AoCUtils/Plot.h>`, Matplot++ is fetched and
+linked for it only. It needs `gnuplot` at runtime (`brew install gnuplot`).
+
+`<AoCUtils/Plot.h>` is a thin wrapper for the boilerplate of one plot: `AoCUtils::plot::line(x, y)`,
+`scatter(x, y)` and `grid(cells)` (any `vector<vector<T>>`, row 0 at the top, so `get2DArray()` works as is).
+Each takes optional `Options`, and shows the plot unless `saveTo` is set:
+
+```cpp
+#include <AoCUtils/Plot.h>
+
+namespace plot = AoCUtils::plot;
+plot::grid(challenge.input.get2DArray(), {.title = "Map", .saveTo = "map.png"});
+```
+
+For anything else, use `matplot::` directly. With gnuplot 6, Matplot++ prints harmless
+"Reading from '-' inside a multiplot" warnings.
 
 ## Tests
 
@@ -113,4 +127,3 @@ ctest --test-dir build
  - `Challenge_Template/`: files copied into every new challenge.
  - `Example/`: sample project using the library. Built too when this repo is the top-level project, ex. opened in an IDE (`-DAOC_BUILD_EXAMPLE=OFF` to skip).
  - `tests/`: unit and integration tests.
- - `LIBRARY_PLAN.md`: notes from turning the repo into a library.

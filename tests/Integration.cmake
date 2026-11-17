@@ -115,4 +115,20 @@ if (result EQUAL 0)
     fail("badoption: configure should have failed")
 endif()
 
+# Case 5 (only with -DMATPLOT=ON, it builds Matplot++): a challenge using Plot.h compiles and links
+if (MATPLOT)
+    make_project(plotting "")
+    file(MAKE_DIRECTORY ${WORK}/plotting/Challenges/PlotDay)
+    file(WRITE ${WORK}/plotting/Challenges/PlotDay/PlotDay.cpp "
+#include <AoCUtils/AoCUtils.h>
+#include <AoCUtils/Plot.h>
+int main() {
+    AoCUtils::plot::line({0, 1, 2}, {0, 1, 4}, {.saveTo = \"line.png\"});
+    AoCUtils::plot::grid(std::vector<std::vector<char>>{{'#', '.'}, {'.', '#'}}, {.saveTo = \"grid.png\"});
+}
+")
+    configure(plotting)
+    run_checked("build plotting" ${CMAKE_COMMAND} --build ${WORK}/plotting/build --target PlotDay)
+endif()
+
 message(STATUS "Integration tests passed")

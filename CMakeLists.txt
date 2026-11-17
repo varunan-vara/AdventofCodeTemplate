@@ -18,6 +18,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     # throwaway consumer projects (see tests/Integration.cmake), so it is opt-in
     option(AOC_BUILD_TESTS "Build the unit tests" ON)
     option(AOC_INTEGRATION_TESTS "Add the CMake integration test (slower)" OFF)
+    option(AOC_MATPLOT_TESTS "Also test Plot.h in the integration test (builds Matplot++)" OFF)
     if (AOC_BUILD_TESTS)
         enable_testing()
         add_executable(UnitTests tests/UnitTests.cpp)
@@ -29,6 +30,7 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
                 -DAOC_SRC=${CMAKE_CURRENT_SOURCE_DIR}
                 -DWORK=${CMAKE_BINARY_DIR}/integration
                 -DBENCHMARK_SRC=${benchmark_SOURCE_DIR}
+                -DMATPLOT=${AOC_MATPLOT_TESTS}
                 -P ${CMAKE_CURRENT_SOURCE_DIR}/tests/Integration.cmake)
         endif()
     endif()

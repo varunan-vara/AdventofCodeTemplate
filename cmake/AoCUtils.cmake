@@ -34,7 +34,7 @@ target_include_directories(AoCUtilsLib PUBLIC ${AOC_UTILS_ROOT}/Utils)
 target_compile_features(AoCUtilsLib PUBLIC cxx_std_17)
 target_link_libraries(AoCUtilsLib PUBLIC benchmark::benchmark)
 
-# Matplot++ is optional: only fetched/built if a challenge includes <matplot/...>
+# Matplot++ is optional: only fetched/built if a challenge includes <matplot/...> or <AoCUtils/Plot.h>
 # Needs gnuplot at runtime (brew install gnuplot)
 function(aoc_require_matplot)
     if (TARGET Matplot++::matplot)
@@ -86,7 +86,7 @@ function(aoc_add_challenge name project_root challenges_dir input_file)
     add_custom_target(run_${name} COMMAND ${name} USES_TERMINAL)
 
     file(READ ${source} source_text)
-    if (source_text MATCHES "#include[ \t]*[<\"]matplot/")
+    if (source_text MATCHES "#include[ \t]*[<\"](matplot|AoCUtils)/(matplot|Plot\\.h)")
         aoc_require_matplot()
         target_link_libraries(${name} PRIVATE Matplot++::matplot)
     endif()
